@@ -41,21 +41,31 @@ services:
     networks:
       - keycloak-and-mysql-network
 
+  start_dependencies:
+    image: dadarek/wait-for-dependencies
+    depends_on:
+      -  mysql-kc
+    command: mysql-kc:3306
+    networks:
+      - keycloak-and-mysql-network
+
   keycloak-w:
     image: quay.io/keycloak/keycloak:24.0.2
-    command: start-dev
+    command: -v start-dev --import-realm
     ports:
-      - 9081:8080
+      - 8181:8080
     restart: unless-stopped
     environment:
       KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin@1234
+      KEYCLOAK_ADMIN_PASSWORD: admin
       KC_DB: mysql
       KC_DB_USERNAME: user
       KC_DB_PASSWORD: password
       KC_DB_URL: jdbc:mysql://mysql-kc:3306/keycloak_db
       KC_FEATURES: token-exchange,admin-fine-grained-authz
       KC_HOSTNAME: localhost
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import
     depends_on:
       - mysql-kc
     networks:
