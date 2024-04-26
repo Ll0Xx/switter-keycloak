@@ -41,14 +41,6 @@ services:
     networks:
       - keycloak-and-mysql-network
 
-  start_dependencies:
-    image: dadarek/wait-for-dependencies
-    depends_on:
-      -  mysql-kc
-    command: mysql-kc:3306
-    networks:
-      - keycloak-and-mysql-network
-
   keycloak-w:
     image: quay.io/keycloak/keycloak:24.0.2
     command: -v start-dev --import-realm
