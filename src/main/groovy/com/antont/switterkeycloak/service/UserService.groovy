@@ -1,10 +1,10 @@
 package com.antont.switterkeycloak.service
 
 import com.antont.switterkeycloak.web.dto.CreateUserDto
-import com.antont.switterkeycloak.web.dto.UpdatePasswordDto
+import com.antont.switterkeycloak.web.dto.PasswordDto
 
 interface UserService {
-    String registerUser(CreateUserDto dto)
-    String updateUser(UpdatePasswordDto dto)
-    String deleteUser(String id)
+    Integer registerUser(CreateUserDto dto)
+    String updateUser(PasswordDto dto, String userId)
+    Integer deleteUser(String userId)
 }

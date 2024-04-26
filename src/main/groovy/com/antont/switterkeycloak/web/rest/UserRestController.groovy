@@ -1,17 +1,18 @@
 package com.antont.switterkeycloak.web.rest
 
-
 import com.antont.switterkeycloak.service.UserService
 import com.antont.switterkeycloak.web.dto.CreateUserDto
-import com.antont.switterkeycloak.web.dto.UpdatePasswordDto
+import com.antont.switterkeycloak.web.dto.PasswordDto
 import jakarta.validation.Valid
 import lombok.AllArgsConstructor
-import org.keycloak.representations.AccessToken
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
-import org.springframework.web.bind.annotation.*
-
-import java.security.Principal
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/user")
@@ -27,27 +28,27 @@ class UserRestController {
     @PostMapping
     ResponseEntity<?> registerUser(@Valid @RequestBody CreateUserDto dto) {
         try {
-            ResponseEntity.ok(userService.registerUser(dto))
+            ResponseEntity.status(userService.registerUser(dto)).build()
         } catch (Exception e) {
             ResponseEntity.badRequest().body(e.message)
         }
     }
 
-//    @PutMapping
-//    ResponseEntity<?> updatePassword(UpdatePasswordDto dto, Authentication auth){
-//        try {
-//            ResponseEntity.ok(userService.updateUser(dto))
-//        } catch (Exception e) {
-//            ResponseEntity.badRequest().body(e.message)
-//        }
-//    }
-//
-//    @DeleteMapping
-//    ResponseEntity<?> deleteUserById(String id) {
-//        try {
-//            ResponseEntity.ok(userService.deleteUser(id))
-//        } catch (Exception e) {
-//            ResponseEntity.badRequest().body(e.message)
-//        }
-//    }
+    @PutMapping
+    ResponseEntity<?> updatePassword(@Valid @RequestBody PasswordDto dto, Authentication auth){
+        try {
+            ResponseEntity.ok(userService.updateUser(dto, auth.name))
+        } catch (Exception e) {
+            ResponseEntity.badRequest().body(e.message)
+        }
+    }
+
+    @DeleteMapping
+    ResponseEntity<?> deleteUserById(Authentication auth) {
+        try {
+            ResponseEntity.status(userService.deleteUser(auth.name)).build()
+        } catch (Exception e) {
+            ResponseEntity.badRequest().body(e.message)
+        }
+    }
 }

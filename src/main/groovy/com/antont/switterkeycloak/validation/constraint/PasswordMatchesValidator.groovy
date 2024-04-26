@@ -1,7 +1,7 @@
 package com.antont.switterkeycloak.validation.constraint
 
 import com.antont.switterkeycloak.validation.PasswordMatches
-import com.antont.switterkeycloak.web.dto.CreateUserDto
+import com.antont.switterkeycloak.web.dto.PasswordDto
 import jakarta.validation.ConstraintValidator
 import jakarta.validation.ConstraintValidatorContext
 
@@ -14,7 +14,7 @@ class PasswordMatchesValidator implements ConstraintValidator<PasswordMatches, O
 
     @Override
     boolean isValid(final Object obj, final ConstraintValidatorContext context) {
-        final CreateUserDto user = (CreateUserDto) obj
+        final PasswordDto user = (PasswordDto) obj
         return user.password == user.passwordConfirmation
     }
 

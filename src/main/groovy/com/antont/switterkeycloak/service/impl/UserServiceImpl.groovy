@@ -3,8 +3,7 @@ package com.antont.switterkeycloak.service.impl
 import com.antont.switterkeycloak.properties.KeycloakProperties
 import com.antont.switterkeycloak.service.UserService
 import com.antont.switterkeycloak.web.dto.CreateUserDto
-import com.antont.switterkeycloak.web.dto.UpdatePasswordDto
-import jakarta.ws.rs.core.Response
+import com.antont.switterkeycloak.web.dto.PasswordDto
 import org.keycloak.admin.client.Keycloak
 import org.keycloak.admin.client.resource.RealmResource
 import org.keycloak.admin.client.resource.UsersResource
@@ -13,9 +12,6 @@ import org.keycloak.representations.idm.UserRepresentation
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-
-import java.util.concurrent.ExecutionException
-
 
 @Service
 class UserServiceImpl implements UserService {
@@ -31,9 +27,8 @@ class UserServiceImpl implements UserService {
     }
 
     @Override
-    String registerUser(CreateUserDto dto) {
+    Integer registerUser(CreateUserDto dto) {
         try {
-
             UserRepresentation user = new UserRepresentation()
             user.setEnabled(true)
             user.setUsername(dto.username)
@@ -48,7 +43,7 @@ class UserServiceImpl implements UserService {
             user.setCredentials(list)
 
             UsersResource usersResource = getUsersResource()
-            usersResource.create(user)
+            usersResource.create(user).status
         } catch (Exception e) {
             String message = "Failed to create user"
             LOGGER.error(message, e)
@@ -57,26 +52,28 @@ class UserServiceImpl implements UserService {
     }
 
     @Override
-    String updateUser(UpdatePasswordDto dto) {
+    String updateUser(PasswordDto dto, String userId) {
         try {
             CredentialRepresentation cred = new CredentialRepresentation()
             cred.setType(CredentialRepresentation.PASSWORD)
-            cred.setValue(dto.newPassword)
+            cred.setValue(dto.password)
             cred.setTemporary(false)
-            realm.users().get(id).resetPassword(cred)
+            getUsersResource().get(userId).resetPassword(cred)
+            "Password successfully updated"
         } catch (Exception e) {
-            String message = "Failed to update password for user: " + id
+            String message = "Failed to update password for user: " + userId
             LOGGER.error(message, e)
             throw new RuntimeException(message)
         }
     }
 
     @Override
-    String deleteUser(String id) {
+    Integer deleteUser(String userId) {
         try {
-            getUsersResource().delete(id)
+            getUsersResource().get(userId).logout()
+            getUsersResource().delete(userId).status
         } catch (Exception e) {
-            String message = "Failed to delete user with id: " + id
+            String message = "Failed to delete user with id: " + userId
             LOGGER.error(message, e)
             throw new RuntimeException(message)
         }

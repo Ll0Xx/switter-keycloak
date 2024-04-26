@@ -8,13 +8,13 @@ import lombok.NoArgsConstructor
 
 @NoArgsConstructor
 @PasswordMatches
-class UpdatePasswordDto {
+class PasswordDto {
     @NotNull
     @NotEmpty
     @Size(min = 3, max = 15)
-    String newPassword
+    String password
     @NotNull
     @NotEmpty
     @Size(min = 3, max = 15)
-    String newPasswordConfirmation
+    String passwordConfirmation
 }
