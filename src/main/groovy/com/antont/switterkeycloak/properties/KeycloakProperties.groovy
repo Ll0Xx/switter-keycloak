@@ -16,12 +16,14 @@ class KeycloakProperties {
     @NotBlank
     String adminClientSecret
     @NotBlank
+    String authClientId
+    @NotBlank
     String authServerUrl
     @NotBlank
     String realm
 
     @Bean
-    Keycloak keycloak(){
+    Keycloak keycloak() {
         return KeycloakBuilder.builder()
                 .serverUrl(authServerUrl)
                 .realm(realm)

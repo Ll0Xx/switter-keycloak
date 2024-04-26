@@ -1,14 +1,12 @@
 package com.antont.switterkeycloak.web.rest
 
+
 import com.antont.switterkeycloak.service.UserService
 import com.antont.switterkeycloak.web.dto.CreateUserDto
 import jakarta.validation.Valid
 import lombok.AllArgsConstructor
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/user")
@@ -22,7 +20,12 @@ class UserRestController {
     }
 
     @PostMapping
-    ResponseEntity<String> registerUser(@Valid @RequestBody CreateUserDto dto){
+    ResponseEntity<String> registerUser(@Valid @RequestBody CreateUserDto dto) {
         return ResponseEntity.ok(userService.registerUser(dto))
+    }
+
+    @GetMapping
+    ResponseEntity<String> getUserInfo() {
+        return ResponseEntity.ok("yay it secure")
     }
 }
