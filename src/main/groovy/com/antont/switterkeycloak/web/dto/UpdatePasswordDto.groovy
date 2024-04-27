@@ -1,29 +1,20 @@
 package com.antont.switterkeycloak.web.dto
 
 import com.antont.switterkeycloak.validation.PasswordMatches
-import groovyjarjarantlr4.v4.runtime.misc.NotNull
-import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotEmpty
+import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import lombok.NoArgsConstructor
 
 @NoArgsConstructor
 @PasswordMatches
-class CreateUserDto {
-
+class UpdatePasswordDto {
     @NotNull
     @NotEmpty
     @Size(min = 3, max = 15)
-    String username
-
-    @NotNull
-    @NotEmpty
-    @Min(3)
-    @Size(min = 3, max = 15)
-    String password
-
+    String newPassword
     @NotNull
     @NotEmpty
     @Size(min = 3, max = 15)
-    String passwordConfirmation
+    String newPasswordConfirmation
 }
