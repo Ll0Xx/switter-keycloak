@@ -1,12 +1,10 @@
 package com.antont.switterkeycloak.service.impl
 
-import com.antont.switterkeycloak.properties.KeycloakProperties
+import com.antont.switterkeycloak.service.AuthenticationService
+import com.antont.switterkeycloak.service.KeycloakService
 import com.antont.switterkeycloak.service.UserService
 import com.antont.switterkeycloak.web.dto.CreateUserDto
 import com.antont.switterkeycloak.web.dto.PasswordDto
-import org.keycloak.admin.client.Keycloak
-import org.keycloak.admin.client.resource.RealmResource
-import org.keycloak.admin.client.resource.UsersResource
 import org.keycloak.representations.idm.CredentialRepresentation
 import org.keycloak.representations.idm.UserRepresentation
 import org.slf4j.Logger
@@ -18,12 +16,12 @@ class UserServiceImpl implements UserService {
 
     private Logger LOGGER = LoggerFactory.getLogger(UserService.class)
 
-    private final Keycloak keycloak
-    private final KeycloakProperties keycloakProperties
+    private final AuthenticationService authenticationService
+    private final KeycloakService keycloakService
 
-    UserServiceImpl(Keycloak keycloak, KeycloakProperties keycloakConfig) {
-        this.keycloak = keycloak
-        this.keycloakProperties = keycloakConfig
+    UserServiceImpl(AuthenticationService authenticationService, KeycloakService keycloakService) {
+        this.authenticationService = authenticationService
+        this.keycloakService = keycloakService
     }
 
     @Override
@@ -42,8 +40,7 @@ class UserServiceImpl implements UserService {
             list.add(representation)
             user.setCredentials(list)
 
-            UsersResource usersResource = getUsersResource()
-            usersResource.create(user).status
+            keycloakService.usersResource.create(user).status
         } catch (Exception e) {
             String message = "Failed to create user"
             LOGGER.error(message, e)
@@ -58,7 +55,7 @@ class UserServiceImpl implements UserService {
             cred.setType(CredentialRepresentation.PASSWORD)
             cred.setValue(dto.password)
             cred.setTemporary(false)
-            getUsersResource().get(userId).resetPassword(cred)
+            keycloakService.usersResource.get(userId).resetPassword(cred)
             "Password successfully updated"
         } catch (Exception e) {
             String message = "Failed to update password for user: " + userId
@@ -70,17 +67,12 @@ class UserServiceImpl implements UserService {
     @Override
     Integer deleteUser(String userId) {
         try {
-            getUsersResource().get(userId).logout()
-            getUsersResource().delete(userId).status
+            authenticationService.logout(userId)
+            keycloakService.usersResource.delete(userId).status
         } catch (Exception e) {
             String message = "Failed to delete user with id: " + userId
             LOGGER.error(message, e)
             throw new RuntimeException(message)
         }
-    }
-
-    private UsersResource getUsersResource() {
-        RealmResource realmResource = keycloak.realm(keycloakProperties.realm)
-        return realmResource.users()
     }
 }

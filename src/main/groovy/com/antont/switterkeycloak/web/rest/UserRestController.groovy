@@ -4,19 +4,12 @@ import com.antont.switterkeycloak.service.UserService
 import com.antont.switterkeycloak.web.dto.CreateUserDto
 import com.antont.switterkeycloak.web.dto.PasswordDto
 import jakarta.validation.Valid
-import lombok.AllArgsConstructor
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/user")
-@AllArgsConstructor
 class UserRestController {
 
     private final UserService userService
