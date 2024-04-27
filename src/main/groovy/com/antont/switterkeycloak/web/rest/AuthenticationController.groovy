@@ -3,6 +3,7 @@ package com.antont.switterkeycloak.web.rest
 import com.antont.switterkeycloak.service.AuthenticationService
 import com.antont.switterkeycloak.web.dto.LoginDto
 import jakarta.validation.Valid
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
@@ -17,8 +18,8 @@ class AuthenticationController {
         this.authenticationService = authenticationService
     }
 
-    @PostMapping("/login")
-    ResponseEntity<?> generateAccessToken(@Valid @RequestBody LoginDto dto){
+    @PostMapping(path = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> generateAccessToken(@Valid @RequestBody LoginDto dto) {
         try {
             ResponseEntity.ok().body(authenticationService.generateAccessToken(dto))
         } catch (Exception e) {

@@ -1,5 +1,7 @@
 package com.antont.switterkeycloak.service.impl
 
+import com.antont.switterkeycloak.db.entity.User
+import com.antont.switterkeycloak.db.repository.UsersRepository
 import com.antont.switterkeycloak.service.AuthenticationService
 import com.antont.switterkeycloak.service.KeycloakService
 import com.antont.switterkeycloak.service.UserService
@@ -18,18 +20,20 @@ class UserServiceImpl implements UserService {
 
     private final AuthenticationService authenticationService
     private final KeycloakService keycloakService
+    private final UsersRepository usersRepository
 
-    UserServiceImpl(AuthenticationService authenticationService, KeycloakService keycloakService) {
+    UserServiceImpl(AuthenticationService authenticationService, KeycloakService keycloakService, UsersRepository usersRepository) {
         this.authenticationService = authenticationService
         this.keycloakService = keycloakService
+        this.usersRepository = usersRepository
     }
 
     @Override
     Integer registerUser(CreateUserDto dto) {
         try {
-            UserRepresentation user = new UserRepresentation()
-            user.setEnabled(true)
-            user.setUsername(dto.username)
+            UserRepresentation userRepresentation = new UserRepresentation()
+            userRepresentation.setEnabled(true)
+            userRepresentation.setUsername(dto.username)
 
             CredentialRepresentation representation = new CredentialRepresentation()
             representation.setValue(dto.password)
@@ -38,9 +42,19 @@ class UserServiceImpl implements UserService {
 
             List<CredentialRepresentation> list = new ArrayList<>()
             list.add(representation)
-            user.setCredentials(list)
+            userRepresentation.setCredentials(list)
 
-            keycloakService.usersResource.create(user).status
+            def status = keycloakService.usersResource.create(userRepresentation).status
+
+            def searchResult = keycloakService.usersResource.searchByUsername(dto.username, true)
+            def createdUserId = searchResult[0].id
+
+            def user = new User()
+            user.username = dto.username
+            user.keycloakId = createdUserId
+            usersRepository.save(user)
+
+            return status
         } catch (Exception e) {
             String message = "Failed to create user"
             LOGGER.error(message, e)

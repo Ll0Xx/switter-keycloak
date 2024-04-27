@@ -27,7 +27,7 @@ class UserRestController {
         }
     }
 
-    @PutMapping
+    @PatchMapping
     ResponseEntity<?> updatePassword(@Valid @RequestBody PasswordDto dto, Authentication auth){
         try {
             ResponseEntity.ok(userService.updateUser(dto, auth.name))

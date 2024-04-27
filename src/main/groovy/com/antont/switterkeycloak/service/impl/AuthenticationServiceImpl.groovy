@@ -39,8 +39,8 @@ class AuthenticationServiceImpl implements AuthenticationService {
             map.add("grant_type", "password")
 
             def entity = new HttpEntity<>(map, headers)
-            def url = keycloakProperties.authServerUrl + "/realms/" + keycloakProperties.realm + "/protocol/openid-connect/token"
-            restTemplate.postForEntity(url, entity, String.class).body
+            def url =  "${keycloakProperties.authServerUrl}/realms/${keycloakProperties.realm}/protocol/openid-connect/token"
+            restTemplate.postForEntity(url.toString(), entity, String.class).body
         } catch (Exception e) {
             def message = "Failed to login"
             LOGGER.error(message)
