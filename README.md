@@ -75,7 +75,7 @@ with body and authentification using access_token
     "content":"<POST_CONTENT>"
 }
 ```
-**3.6 Create post**
+**3.6 Edit post**
 ```
 POST http://localhost:8080/posts
 ```
@@ -86,48 +86,37 @@ with body and authentification using access_token
     "content":"<POST_CONTENT>"
 }
  ```
-**3.7 Edit post**
-```
-PATCH http://localhost:8080/posts/<POST_ID>
-```
-with body and authentification using access_token
-```
-{
-    "title": "<POST_TITLE>",
-    "content":"<POST_CONTENT>"
-}
- ```
-**3.8 Edit post**
+**3.7 Delete post**
 ```
 DELETE http://localhost:8080/posts/<POST_ID>
 ```
 with authentification using access_token
 
-**3.9 Leave post favorite**
+**3.8 Leave post favorite**
 ```
 POST http://localhost:8080/posts/<POST_ID>/add-favorite
 ```
 with authentification using access_token
 
-**3.10 Delete post favorite**
+**3.9 Delete post favorite**
 ```
 POST http://localhost:8080/posts/<POST_ID>/remove-favorite
 ```
 with authentification using access_token
 
-**3.11 Subscription to a user**
+**3.10 Subscription to a user**
 ```
 POST http://localhost:8080/subscribe?to=<USERNAME_YOU_WANT_SUBSCRIBE_TO>
 ```
 with authentification using access_token
 
-**3.12 Unsubscription from a user**
+**3.11 Unsubscription from a user**
 ```
 POST http://localhost:8080/unsubscribe?from=<USERNAME_YOU_WANT_UNSUBSCRIBE_FROM>
 ```
 with authentification using access_token
 
-**3.13  Commenting on a post**
+**3.12  Commenting on a post**
 ```
 POST http://localhost:8080/posts/<POST_ID>/add-comment
 ```
@@ -137,19 +126,19 @@ with body and authentification using access_token
     "comment": "<COMMENT_TEXT>"
 }
  ```
-**3.14  Get a user's feed**
+**3.13  Get a user's feed**
 ```
 GET http://localhost:8080/feed
 ```
 with authentification using access_token
 
-**3.15  Get another user's feed**
+**3.14  Get another user's feed**
 ```
 GET http://localhost:8080/feed/<USER_NAME>
 ```
 with authentification using access_token
 
-**3.16  Get post comments**
+**3.15  Get post comments**
 ```
 GET http://localhost:8080/posts/<POST_ID>/get-comment
 ```
