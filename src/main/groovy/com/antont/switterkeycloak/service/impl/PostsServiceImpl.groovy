@@ -8,8 +8,13 @@ import com.antont.switterkeycloak.db.repository.UsersRepository
 import com.antont.switterkeycloak.service.PostsService
 import com.antont.switterkeycloak.web.dto.CommentDto
 import com.antont.switterkeycloak.web.dto.PostDto
+import org.bson.types.ObjectId
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.data.mongodb.core.aggregation.Aggregation
+import org.springframework.data.mongodb.core.aggregation.AggregationResults
+import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.stereotype.Service
 
 @Service
@@ -20,23 +25,25 @@ class PostsServiceImpl implements PostsService {
     private final PostsRepository postsRepository
     private final UsersRepository usersRepository
     private final CommentsRepository commentsRepository
+    private final MongoTemplate mongoTemplate
 
-    PostsServiceImpl(PostsRepository postsRepository, UsersRepository usersRepository, CommentsRepository commentsRepository) {
+    PostsServiceImpl(PostsRepository postsRepository, UsersRepository usersRepository, CommentsRepository commentsRepository, MongoTemplate mongoTemplate) {
         this.postsRepository = postsRepository
         this.usersRepository = usersRepository
         this.commentsRepository = commentsRepository
+        this.mongoTemplate = mongoTemplate
     }
 
     @Override
     Post getPost(String postId) {
         try {
-            def post = postsRepository.findById(postId).orElseThrow {
-                throw new RuntimeException("Post with id: ${postId} now found")
-            }
-
-            // TODO investigate why Aggregation.lookup is not returning the expected result
-            post.comments.addAll(commentsRepository.findAllByPostId(postId))
-            post
+            ObjectId postObjectId = new ObjectId(postId)
+            Aggregation aggregation = Aggregation.newAggregation(
+                    Aggregation.match(Criteria.where("_id").is(postObjectId)),
+                    Aggregation.lookup("comments", "postId", "_id", "comments")
+            )
+            AggregationResults<Post> results = mongoTemplate.aggregate(aggregation, "posts", Post.class)
+            return results.getUniqueMappedResult()
         }catch (Exception e){
             String message = "Failed to get post data"
             LOGGER.error(message, e)
