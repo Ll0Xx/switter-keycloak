@@ -30,7 +30,7 @@ class AuthenticationController {
     @PostMapping("/logout")
     ResponseEntity<?> logout(Authentication auth){
         try {
-            ResponseEntity.ok().(authenticationService.logout(auth.name)).build()
+            ResponseEntity.ok().body(authenticationService.logout(auth.name))
         } catch (Exception e) {
             ResponseEntity.badRequest().body(e.message)
         }

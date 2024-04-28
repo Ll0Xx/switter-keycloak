@@ -138,7 +138,7 @@ class PostsServiceImpl implements PostsService {
             comment.comment = commentDto.comment
 
             commentsRepository.save(comment)
-            "Your comment was sucessfully added to rhe post ${postId}"
+            "Your comment was sucessfully added to the post ${postId}"
         } catch (Exception e) {
             LOGGER.error(e.message)
             throw new RuntimeException(e.message)

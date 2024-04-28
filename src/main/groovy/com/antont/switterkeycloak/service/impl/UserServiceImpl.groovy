@@ -11,6 +11,7 @@ import org.keycloak.representations.idm.CredentialRepresentation
 import org.keycloak.representations.idm.UserRepresentation
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 
 @Service
@@ -31,6 +32,10 @@ class UserServiceImpl implements UserService {
     @Override
     Integer registerUser(CreateUserDto dto) {
         try {
+            if (usersRepository.findByUsername(dto.username).isPresent()) {
+                return HttpStatus.CONFLICT.value()
+            }
+
             UserRepresentation userRepresentation = new UserRepresentation()
             userRepresentation.setEnabled(true)
             userRepresentation.setUsername(dto.username)
@@ -86,6 +91,10 @@ class UserServiceImpl implements UserService {
     @Override
     Integer deleteUser(String userId) {
         try {
+            def userToDelete = usersRepository.findByKeycloakId(userId).orElseThrow {
+                new RuntimeException("Failed to find user with ${userId} keycloak id")
+            }
+            usersRepository.delete(userToDelete)
             authenticationService.logout(userId)
             keycloakService.usersResource.delete(userId).status
         } catch (Exception e) {

@@ -1,0 +1,58 @@
+services:
+  mongo-test:
+    image: mongo:latest
+    restart: always
+    container_name: mongo-test
+    command: mongod --port 27018
+    ports:
+      - "27018:27018"
+    environment:
+      MONGO_INITDB_DATABASE: switter_db_test
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_DB_USERNAME: user
+      MONGO_DB_PASSWORD: pass
+    volumes:
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+
+  mysql-kc-test:
+    image: mysql:8.0.27
+    ports:
+      - 3378:3307
+    restart: unless-stopped
+    environment:
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: keycloak_db_test
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_TCP_PORT: 3307
+    volumes:
+      - keycloak-and-mysql-volume:/var/lib/mysql
+    networks:
+      - keycloak-and-mysql-network
+
+  keycloak-w-test:
+    image: quay.io/keycloak/keycloak:24.0.2
+    command: -v start-dev --import-realm --http-port=8182
+    ports:
+      - 8182:8182
+    restart: unless-stopped
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: mysql
+      KC_DB_USERNAME: user
+      KC_DB_PASSWORD: password
+      KC_DB_URL: jdbc:mysql://mysql-kc-test:3307/keycloak_db_test
+      KC_FEATURES: token-exchange,admin-fine-grained-authz
+      KC_HOSTNAME: localhost
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import
+    depends_on:
+      - mysql-kc-test
+    networks:
+      - keycloak-and-mysql-network
+networks:
+  keycloak-and-mysql-network:
+volumes:
+  keycloak-and-mysql-volume:

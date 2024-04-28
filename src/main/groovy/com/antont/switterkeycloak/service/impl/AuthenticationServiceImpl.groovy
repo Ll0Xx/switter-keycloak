@@ -49,7 +49,7 @@ class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    void logout(String userId) {
+    String logout(String userId) {
         try {
             keycloakService.usersResource.get(userId).logout()
             "You have successfully signed out of your account"
