@@ -8,4 +8,5 @@ import org.springframework.transaction.annotation.Transactional
 interface PostsRepository extends MongoRepository<Post, String> {
     Optional<Post> findByIdAndPostOwner(String postId, String user)
     List<Post> findAllByPostOwner(String user)
+    List<Post> findAllByPostOwnerIn(List<String> user)
 }

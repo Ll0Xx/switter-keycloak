@@ -19,7 +19,7 @@ class FeedRestController {
     }
 
     @GetMapping
-    ResponseEntity<?> getPost(Authentication auth) {
+    ResponseEntity<?> getUserFeedPost(Authentication auth) {
         try {
             ResponseEntity.ok().body(feedService.getUsersFeedByKeycloakId(auth.name))
         } catch (Exception e) {
@@ -27,10 +27,10 @@ class FeedRestController {
         }
     }
 
-    @GetMapping("/{id}")
-    ResponseEntity<?> getPost(@PathVariable("id") String userId) {
+    @GetMapping("/{user}")
+    ResponseEntity<?> getUserFeedPost(@PathVariable("user") String userId) {
         try {
-            ResponseEntity.ok().body(feedService.getUsersFeedByUserId(userId))
+            ResponseEntity.ok().body(feedService.getUserFeed(userId))
         } catch (Exception e) {
             ResponseEntity.badRequest().body(e.message)
         }
