@@ -10,7 +10,6 @@ import com.antont.switterkeycloak.web.dto.CommentDto
 import com.antont.switterkeycloak.web.dto.PostDto
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.stereotype.Service
 
 @Service
@@ -21,13 +20,11 @@ class PostsServiceImpl implements PostsService {
     private final PostsRepository postsRepository
     private final UsersRepository usersRepository
     private final CommentsRepository commentsRepository
-    private final MongoTemplate mongoTemplate
 
-    PostsServiceImpl(PostsRepository postsRepository, UsersRepository usersRepository, CommentsRepository commentsRepository, MongoTemplate mongoTemplate) {
+    PostsServiceImpl(PostsRepository postsRepository, UsersRepository usersRepository, CommentsRepository commentsRepository) {
         this.postsRepository = postsRepository
         this.usersRepository = usersRepository
         this.commentsRepository = commentsRepository
-        this.mongoTemplate = mongoTemplate
     }
 
     @Override
