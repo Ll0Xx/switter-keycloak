@@ -1,10 +1,10 @@
 package com.antont.switterkeycloak.db.repository
 
-import com.antont.switterkeycloak.db.entity.User
+import com.antont.switterkeycloak.db.entity.Subscription
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.transaction.annotation.Transactional
 
 @Transactional(readOnly = true)
-interface UsersRepository extends MongoRepository<User, String> {
-    Optional<User> findByKeycloakId(String keycloakId)
+interface SubscriptionRepository extends MongoRepository<Subscription, String>{
+    Optional<Subscription> findByUserId(String userid)
 }
