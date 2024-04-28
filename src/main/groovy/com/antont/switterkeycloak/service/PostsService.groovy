@@ -7,5 +7,7 @@ interface PostsService {
     Post getPost(String userId)
     Post createPost(PostDto dto, String userId)
     Post editPost(PostDto dto, String postId, String userId)
+    Post addToFavorite(String postId, String userId)
+    Post removeFromFavorite(String postId, String userId)
     void deletePost(String postId, String userId)
 }

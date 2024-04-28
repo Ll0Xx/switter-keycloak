@@ -45,14 +45,7 @@ class UserServiceImpl implements UserService {
             userRepresentation.setCredentials(list)
 
             def status = keycloakService.usersResource.create(userRepresentation).status
-
-            def searchResult = keycloakService.usersResource.searchByUsername(dto.username, true)
-            def createdUserId = searchResult[0].id
-
-            def user = new User()
-            user.username = dto.username
-            user.keycloakId = createdUserId
-            usersRepository.save(user)
+            saveUser(dto.username)
 
             return status
         } catch (Exception e) {
@@ -60,6 +53,18 @@ class UserServiceImpl implements UserService {
             LOGGER.error(message, e)
             throw new RuntimeException(message)
         }
+    }
+
+    private void saveUser(String username) {
+        def searchResult = keycloakService.usersResource.searchByUsername(username, true)
+        if (searchResult.size() != 1) {
+            throw new RuntimeException("Failed to find user by username")
+        }
+        def createdUserId = searchResult[0].id
+        def user = new User()
+        user.username = username
+        user.keycloakId = createdUserId
+        usersRepository.save(user)
     }
 
     @Override

@@ -39,7 +39,7 @@ class PostsServiceImpl implements PostsService {
             def post = new Post()
             post.title = dto.title
             post.content = dto.content
-            post.postOwner = user
+            post.postOwner = user.id
 
             postsRepository.save(post)
         } catch (Exception e) {
@@ -56,12 +56,49 @@ class PostsServiceImpl implements PostsService {
                 throw new RuntimeException("User with id: ${userId} now found")
             }
 
-            def post = postsRepository.findByIdAndPostOwner(postId, user).orElseThrow {
+            def post = postsRepository.findByIdAndPostOwner(postId, user.id).orElseThrow {
                 throw new RuntimeException("Post with id: ${postId} now found")
             }
             post.title = dto.title
             post.content = dto.content
 
+            postsRepository.save(post)
+        } catch (Exception e) {
+            LOGGER.error(e.message)
+            throw new RuntimeException(e.message)
+        }
+    }
+
+    @Override
+    Post addToFavorite(String postId, String userId) {
+        try {
+            def user = usersRepository.findByKeycloakId(userId).orElseThrow {
+                throw new RuntimeException("User with id: ${userId} now found")
+            }
+
+            def post = postsRepository.findById(postId).orElseThrow {
+                throw new RuntimeException("Post with id: ${postId} now found")
+            }
+
+            post.favorites.add(user.id)
+            postsRepository.save(post)
+        } catch (Exception e) {
+            LOGGER.error(e.message)
+            throw new RuntimeException(e.message)
+        }
+    }
+
+    @Override
+    Post removeFromFavorite(String postId, String userId) {
+        try {
+            def user = usersRepository.findByKeycloakId(userId).orElseThrow {
+                throw new RuntimeException("User with id: ${userId} now found")
+            }
+            def post = postsRepository.findById(postId).orElseThrow {
+                throw new RuntimeException("Post with id: ${postId} now found")
+            }
+
+            post.favorites.remove(user.id)
             postsRepository.save(post)
         } catch (Exception e) {
             LOGGER.error(e.message)
@@ -76,7 +113,7 @@ class PostsServiceImpl implements PostsService {
                 throw new RuntimeException("User with id: ${userId} now found")
             }
 
-            def post = postsRepository.findByIdAndPostOwner(postId, user).orElseThrow {
+            def post = postsRepository.findByIdAndPostOwner(postId, user.id).orElseThrow {
                 throw new RuntimeException("Post with id: ${postId} now found")
             }
             postsRepository.delete(post)
