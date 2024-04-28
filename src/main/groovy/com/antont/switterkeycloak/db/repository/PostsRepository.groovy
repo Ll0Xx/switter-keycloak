@@ -5,4 +5,5 @@ import org.springframework.data.mongodb.repository.MongoRepository
 
 interface PostsRepository extends MongoRepository<Post, String> {
     Optional<Post> findByIdAndPostOwner(String postId, String user)
+    List<Post> findAllByPostOwner(String user)
 }
