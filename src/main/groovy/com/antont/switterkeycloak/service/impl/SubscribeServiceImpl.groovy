@@ -29,11 +29,13 @@ class SubscribeServiceImpl implements SubscribeService {
                 throw new RuntimeException("User with id: ${userId} now found")
             }
 
-            def subscribeToUser = usersRepository.findById(subscribeToId).orElseThrow {
-                throw new RuntimeException("Could't find the user with id: ${subscribeToId} that you want to subscribe to")
+            def subscribeToUser = usersRepository.findByUsername(subscribeToId).orElseGet {
+                usersRepository.findById(subscribeToId).orElseThrow {
+                    throw new RuntimeException("Could not find the user with the username or ID you want to subscribe to")
+                }
             }
 
-            if(user.id == subscribeToUser.id){
+            if (user.id == subscribeToUser.id) {
                 throw new RuntimeException("You cannot subscribe to yourself")
             }
 
@@ -54,9 +56,15 @@ class SubscribeServiceImpl implements SubscribeService {
                 throw new RuntimeException("User with id: ${userId} now found")
             }
 
+            def unsubscribeFromUser = usersRepository.findByUsername(subscribeToId).orElseGet {
+                usersRepository.findById(subscribeToId).orElseThrow {
+                    throw new RuntimeException("Could not find the user with the username or ID you want to unsubscribe from")
+                }
+            }
+
             def subscription = subscriptionRepository.findByUserId(user.id).orElse(new Subscription())
             subscription.userId = user.id
-            subscription.subscribedTo.remove(subscribeToId)
+            subscription.subscribedTo.remove(unsubscribeFromUser.id)
             subscriptionRepository.save(subscription).subscribedTo.asList()
         } catch (Exception e) {
             LOGGER.error(e.message)

@@ -7,4 +7,5 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 interface UsersRepository extends MongoRepository<User, String> {
     Optional<User> findByKeycloakId(String keycloakId)
+    Optional<User> findByUsername(String username)
 }
