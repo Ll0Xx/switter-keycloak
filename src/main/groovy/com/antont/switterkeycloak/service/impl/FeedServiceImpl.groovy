@@ -2,6 +2,7 @@ package com.antont.switterkeycloak.service.impl
 
 import com.antont.switterkeycloak.db.entity.Post
 import com.antont.switterkeycloak.db.entity.User
+import com.antont.switterkeycloak.db.repository.CommentsRepository
 import com.antont.switterkeycloak.db.repository.PostsRepository
 import com.antont.switterkeycloak.db.repository.SubscriptionRepository
 import com.antont.switterkeycloak.db.repository.UsersRepository
@@ -18,11 +19,13 @@ class FeedServiceImpl implements FeedService {
     private final PostsRepository postsRepository
     private final UsersRepository usersRepository
     private final SubscriptionRepository subscriptionRepository
+    private final CommentsRepository commentsRepository
 
-    FeedServiceImpl(PostsRepository postsRepository, UsersRepository usersRepository, SubscriptionRepository subscriptionRepository) {
+    FeedServiceImpl(PostsRepository postsRepository, UsersRepository usersRepository, SubscriptionRepository subscriptionRepository, CommentsRepository commentsRepository) {
         this.postsRepository = postsRepository
         this.usersRepository = usersRepository
         this.subscriptionRepository = subscriptionRepository
+        this.commentsRepository = commentsRepository
     }
 
     @Override
@@ -61,6 +64,12 @@ class FeedServiceImpl implements FeedService {
             throw new RuntimeException("This user is not currently subscribed to anyone")
         }
 
-        postsRepository.findAllByPostOwnerIn(subscription.subscribedTo.asList())
+        // TODO investigate why Aggregation.lookup is not returning the expected result
+        def posts = postsRepository.findAllByPostOwnerIn(subscription.subscribedTo.asList())
+        posts.forEach {
+            def comments = commentsRepository.findAllByPostId(it.id)
+            it.comments.addAll(comments)
+        }
+        posts
     }
 }

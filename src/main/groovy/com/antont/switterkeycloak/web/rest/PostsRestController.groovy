@@ -1,5 +1,6 @@
 package com.antont.switterkeycloak.web.rest
 
+import com.antont.switterkeycloak.db.repository.CommentsRepository
 import com.antont.switterkeycloak.service.PostsService
 import com.antont.switterkeycloak.web.dto.PostDto
 import jakarta.validation.Valid

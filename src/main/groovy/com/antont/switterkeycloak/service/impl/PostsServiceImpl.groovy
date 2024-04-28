@@ -1,12 +1,16 @@
 package com.antont.switterkeycloak.service.impl
 
+import com.antont.switterkeycloak.db.entity.Comment
 import com.antont.switterkeycloak.db.entity.Post
+import com.antont.switterkeycloak.db.repository.CommentsRepository
 import com.antont.switterkeycloak.db.repository.PostsRepository
 import com.antont.switterkeycloak.db.repository.UsersRepository
 import com.antont.switterkeycloak.service.PostsService
+import com.antont.switterkeycloak.web.dto.CommentDto
 import com.antont.switterkeycloak.web.dto.PostDto
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.stereotype.Service
 
 @Service
@@ -16,16 +20,30 @@ class PostsServiceImpl implements PostsService {
 
     private final PostsRepository postsRepository
     private final UsersRepository usersRepository
+    private final CommentsRepository commentsRepository
+    private final MongoTemplate mongoTemplate
 
-    PostsServiceImpl(PostsRepository postsRepository, UsersRepository usersRepository) {
+    PostsServiceImpl(PostsRepository postsRepository, UsersRepository usersRepository, CommentsRepository commentsRepository, MongoTemplate mongoTemplate) {
         this.postsRepository = postsRepository
         this.usersRepository = usersRepository
+        this.commentsRepository = commentsRepository
+        this.mongoTemplate = mongoTemplate
     }
 
     @Override
-    Post getPost(String userId) {
-        postsRepository.findById(userId).orElseThrow {
-            throw new RuntimeException("Post with id: ${userId} now found")
+    Post getPost(String postId) {
+        try {
+            def post = postsRepository.findById(postId).orElseThrow {
+                throw new RuntimeException("Post with id: ${postId} now found")
+            }
+
+            // TODO investigate why Aggregation.lookup is not returning the expected result
+            post.comments.addAll(commentsRepository.findAllByPostId(postId))
+            post
+        }catch (Exception e){
+            String message = "Failed to get post data"
+            LOGGER.error(message, e)
+            throw new RuntimeException(message)
         }
     }
 
@@ -100,6 +118,40 @@ class PostsServiceImpl implements PostsService {
 
             post.favorites.remove(user.id)
             postsRepository.save(post)
+        } catch (Exception e) {
+            LOGGER.error(e.message)
+            throw new RuntimeException(e.message)
+        }
+    }
+
+    @Override
+    String addComment(String postId, CommentDto commentDto, String userId) {
+        try {
+            def user = usersRepository.findByKeycloakId(userId).orElseThrow {
+                throw new RuntimeException("User with id: ${userId} now found")
+            }
+
+            def post = postsRepository.findById(postId).orElseThrow {
+                throw new RuntimeException("Post with id: ${postId} now found")
+            }
+
+            def comment = new Comment()
+            comment.author = user.id
+            comment.postId = post.id
+            comment.comment = commentDto.comment
+
+            commentsRepository.save(comment)
+            "Your comment was sucessfully added to rhe post ${postId}"
+        } catch (Exception e) {
+            LOGGER.error(e.message)
+            throw new RuntimeException(e.message)
+        }
+    }
+
+    @Override
+    List<Comment> getComments(String postId) {
+        try {
+            commentsRepository.findAllByPostId(postId)
         } catch (Exception e) {
             LOGGER.error(e.message)
             throw new RuntimeException(e.message)
